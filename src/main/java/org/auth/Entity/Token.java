@@ -2,9 +2,7 @@ package org.auth.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,8 +12,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Token {
 
     @Id
