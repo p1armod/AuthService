@@ -9,7 +9,6 @@ import org.auth.Entity.Type.RoleType;
 
 @Entity
 @Data
-@RequiredArgsConstructor
 @NoArgsConstructor
 public class Role {
 

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 
 @Service
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Data
 public class UserDetailsServiceImpl implements UserDetailsService {
