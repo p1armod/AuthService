@@ -9,8 +9,10 @@ import org.auth.Entity.UserInfo;
 import org.auth.Repository.TokenRepository;
 import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -42,13 +44,7 @@ public class RefreshTokenService {
                 .build();
         refreshTokenRepository.save(token);
         RefreshTokenResponseDTO refreshTokenResponseDTO = new RefreshTokenResponseDTO();
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getUserName(),
-                user.getPassword(), // must be the hashed password
-                user.getRoles().stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
-                        .collect(Collectors.toList())
-        );
+        UserDetails userDetails = getUserDetails(user);
         refreshTokenResponseDTO.setAccessToken(jwtService.generateToken(userDetails));
         refreshTokenResponseDTO.setRefreshToken(token.getToken());
         return refreshTokenResponseDTO;
@@ -64,10 +60,23 @@ public class RefreshTokenService {
             throw new RuntimeException("Token is expired, Please login again.");
         }
         RefreshTokenResponseDTO refreshTokenResponseDTO = new RefreshTokenResponseDTO();
-        UserDetails userDetails = modelMapper.map(token.getUser(), UserDetails.class);
+        UserInfo user = token.getUser();
+        System.out.println("Refresh Token: " + refreshToken.getRefreshToken());
+        UserDetails userDetails = getUserDetails(user);
         refreshTokenResponseDTO.setAccessToken(jwtService.generateToken(userDetails));
         refreshTokenResponseDTO.setRefreshToken(token.getToken());
         return refreshTokenResponseDTO;
+    }
+
+    private UserDetails getUserDetails(UserInfo user) {
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getPassword(), // must be the hashed password
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                        .collect(Collectors.toList())
+        );
+        return userDetails;
     }
 
 
