@@ -17,7 +17,7 @@ public class SignUpRequestDTO {
     private String password;
 
     @NotNull
-    private Set<Role> roles;
+    private Set<String> roles;
 
 
 }

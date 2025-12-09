@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.auth.DTO.SignUp.SignUpRequestDTO;
 import org.auth.DTO.SignUp.SignUpResponseDTO;
+import org.auth.Entity.Role;
+import org.auth.Entity.Type.RoleType;
 import org.auth.Entity.UserInfo;
+import org.auth.Repository.RoleRepository;
 import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final RoleRepository roleRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -46,6 +53,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
         UserInfo user = modelMapper.map(signUpRequestDTO, UserInfo.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Set<Role> roleEntities = signUpRequestDTO.getRoles()
+                .stream()
+                .map(roleName -> roleRepository.findByRoleName(RoleType.valueOf(roleName)))
+                .collect(Collectors.toSet());
+
+        user.setRoles(roleEntities);
         UserInfo savedUser = userRepository.save(user);
         SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO();
         if(savedUser == null){
