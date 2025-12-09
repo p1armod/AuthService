@@ -13,9 +13,11 @@ import org.auth.Service.UserDetailsServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.token.TokenService;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,17 +30,21 @@ public class TokenController {
     private final JWTService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    @PostMapping("/auth/v1/signin")
+    @PostMapping("/auth/v1/login")
     public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInRequestDTO signInRequestDTO) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDTO.getUsername(), signInRequestDTO.getPassword()));
-        if (authentication.isAuthenticated()) {
-            RefreshTokenResponseDTO refreshTokenResponseDTO = tokenService.createRefreshToken(signInRequestDTO.getUsername());
-            if(refreshTokenResponseDTO != null) {
-                return ResponseEntity.ok(SignInResponseDTO.builder()
-                        .accessToken(refreshTokenResponseDTO.getAccessToken())
-                        .refreshToken(refreshTokenResponseDTO.getRefreshToken())
-                        .username(signInRequestDTO.getUsername()).build());
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequestDTO.getUsername(), signInRequestDTO.getPassword()));
+            if (authentication.isAuthenticated()) {
+                RefreshTokenResponseDTO refreshTokenResponseDTO = tokenService.createRefreshToken(signInRequestDTO.getUsername());
+                if(refreshTokenResponseDTO != null) {
+                    return ResponseEntity.ok(SignInResponseDTO.builder()
+                            .accessToken(refreshTokenResponseDTO.getAccessToken())
+                            .refreshToken(refreshTokenResponseDTO.getRefreshToken())
+                            .username(signInRequestDTO.getUsername()).build());
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Bad credentials");
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }

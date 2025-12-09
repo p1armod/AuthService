@@ -9,6 +9,7 @@ import org.auth.Entity.UserInfo;
 import org.auth.Repository.TokenRepository;
 import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,10 @@ public class RefreshTokenService {
 
     public RefreshTokenResponseDTO createRefreshToken(String userName) {
         UserInfo user = userRepository.findByUserName(userName);
+        Token prevToken = refreshTokenRepository.findByUser(user);
+        if(prevToken != null){
+            refreshTokenRepository.delete(prevToken);
+        }
         Token token = Token.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
@@ -36,7 +42,13 @@ public class RefreshTokenService {
                 .build();
         refreshTokenRepository.save(token);
         RefreshTokenResponseDTO refreshTokenResponseDTO = new RefreshTokenResponseDTO();
-        UserDetails userDetails = modelMapper.map(user, UserDetails.class);
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getPassword(), // must be the hashed password
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                        .collect(Collectors.toList())
+        );
         refreshTokenResponseDTO.setAccessToken(jwtService.generateToken(userDetails));
         refreshTokenResponseDTO.setRefreshToken(token.getToken());
         return refreshTokenResponseDTO;

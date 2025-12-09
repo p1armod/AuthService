@@ -3,6 +3,7 @@ package org.auth.Config;
 import lombok.RequiredArgsConstructor;
 import org.auth.Auth.JWTFilter;
 import org.auth.Service.JWTService;
+import org.auth.Service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +28,7 @@ import javax.naming.AuthenticationException;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final JWTFilter jwtFilter;
     private final PasswordEncoder passwordEncoder;
 

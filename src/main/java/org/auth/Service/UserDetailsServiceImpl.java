@@ -15,6 +15,7 @@ import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,7 +45,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
-        return modelMapper.map(user, UserDetails.class);
+
+        return new org.springframework.security.core.userdetails.User(
+                user.getUserName(),
+                user.getPassword(), // must be the hashed password
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
+                        .collect(Collectors.toList())
+        );
     }
 
     public SignUpResponseDTO signUp(SignUpRequestDTO signUpRequestDTO) throws Exception {

@@ -46,4 +46,12 @@ public class JWTFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request,response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.equals("/auth/v1/login")
+                || path.equals("/auth/v1/signup")
+                || path.equals("/auth/v1/refreshtoken");
+    }
 }
