@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.auth.DTO.RefreshToken.RefreshTokenRequestDTO;
 import org.auth.DTO.RefreshToken.RefreshTokenResponseDTO;
 import org.auth.Entity.Token;
-import org.auth.Entity.User;
+import org.auth.Entity.UserInfo;
+import org.auth.Entity.UserInfo;
 import org.auth.Repository.TokenRepository;
 import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -27,7 +28,7 @@ public class RefreshTokenService {
     private static final long RefreshTokenValidity = 1000L*3600*24*30;
 
     public RefreshTokenResponseDTO createRefreshToken(String userName) {
-        User user = userRepository.findByUserName(userName);
+        UserInfo user = userRepository.findByUserName(userName);
         Token token = Token.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())

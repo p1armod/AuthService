@@ -29,7 +29,7 @@ public class Token {
 
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(nullable = false)
-    private User user;
+    private UserInfo user;
 
     @Column(nullable = false,updatable = false)
     @CreationTimestamp

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.auth.DTO.SignUp.SignUpRequestDTO;
 import org.auth.DTO.SignUp.SignUpResponseDTO;
-import org.auth.Entity.User;
+import org.auth.Entity.UserInfo;
 import org.auth.Repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username);
+        UserInfo user = userRepository.findByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
@@ -41,9 +41,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if(userRepository.findByUserName(signUpRequestDTO.getUsername()) != null){
             throw new Exception("Username already exists");
         }
-        User user = modelMapper.map(signUpRequestDTO, User.class);
+        UserInfo user = modelMapper.map(signUpRequestDTO, UserInfo.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userRepository.save(user);
+        UserInfo savedUser = userRepository.save(user);
         SignUpResponseDTO signUpResponseDTO = new SignUpResponseDTO();
         if(savedUser == null){
             signUpResponseDTO.setStatus("Failed");

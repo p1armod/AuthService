@@ -6,21 +6,21 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.auth.Entity.Type.RoleType;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class UserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private Long userId;
+    private UUID userId;
 
     @Column(nullable = false)
     @Size(min = 3, max = 30)
